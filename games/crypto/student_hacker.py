@@ -25,7 +25,7 @@ def crack_encryption(challenge):
     elif "SLICE" in challenge:
         # Q: Sum of last 2 items in [10, 20, 30, 40, 50]
         data = [10, 20, 30, 40, 50]
-        # TODO: Use negative slicing and sum()
+        # TODO: Use negative slicing [-2:] and sum()
         return 0
         
     elif "KEYGEN" in challenge:
@@ -42,6 +42,7 @@ def crack_encryption(challenge):
         
     elif "STRING" in challenge:
         # Q: Length of string 'Data' multiplied by 5
+        # HINT: len("Data") * 5
         return 0
 
     # === SECURITY LAYER 2: NUMPY MATRICES ===
@@ -74,6 +75,25 @@ def crack_encryption(challenge):
     elif "SHAPE" in challenge:
         # Q: Number of columns in array reshaped to (2, 5)
         # HINT: A shape is (rows, cols). Return cols.
+        return 5
+
+    # === SECURITY LAYER 3: ADVANCED ENCRYPTION (HARD) ===
+
+    elif "FILTER" in challenge:
+        # Q: Sum of numbers divisible by 3 in range(1, 20)
+        # HINT: Use [x for x in range(...) if ...]
+        return 0
+
+    elif "MASK" in challenge:
+        # Q: Sum of all items > 5 in np.array([2, 8, 1, 10, 5, 7])
+        arr = np.array([2, 8, 1, 10, 5, 7])
+        # HINT: Use boolean indexing
+        return 0
+
+    elif "2D-SLICE" in challenge:
+        # Q: Sum of the last row of a 3x3 matrix (values 0-8)
+        arr = np.arange(9).reshape(3,3)
+        # HINT: Slice the last row and sum
         return 0
 
     return 0

@@ -9,7 +9,7 @@ import socket
 from datetime import datetime
 
 # --- CONFIGURATION ---
-GOAL_AMOUNT = 10000000  # $10 Million Target
+GOAL_AMOUNT = 100_000_000  # $100 Million Target
 PORT = 8000
 
 app = FastAPI()
@@ -251,6 +251,11 @@ PROBLEMS = [
     {"id": 8, "q": "BROADCAST: Sum of np.array([1, 2]) + 10", "a": 23},
     {"id": 9, "q": "ARGMAX: Index of max value in [1, 5, 2, 4]", "a": 1},
     {"id": 10, "q": "SHAPE: Columns in array reshaped to (2, 5)", "a": 5},
+
+    # --- NEW DIFFICULT QUESTIONS ---
+    {"id": 11, "q": "FILTER: Sum of numbers divisible by 3 in range(1, 20)", "a": 63}, # 3+6+9+12+15+18 = 63
+    {"id": 12, "q": "MASK: Sum of all items > 5 in np.array([2, 8, 1, 10, 5, 7])", "a": 25}, # 8+10+7 = 25
+    {"id": 13, "q": "2D-SLICE: Sum of the last row of np.arange(9).reshape(3,3)", "a": 21}, # 6+7+8 = 21
 ]
 
 @app.get("/")
