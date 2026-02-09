@@ -112,19 +112,6 @@ Once all 10 markets are stable, a **Master Equation** will appear on the main sc
 
 ---
 
-### Teacher Guide: How to run the Final Phase
-
-1. **The Screen:** The students will see the 10 locks turning green one by one. The health bar will tick down every minute.
-2. **The Reveal:** Once the 10th key is entered, the "Final Equation" appears on screen automatically.
-* Formula: 
-
-
-3. **The Chaos:**
-* Suddenly, **Group 1** needs to talk to **Group 6**.
-* **Group 2** needs **Group 7**.
-* Everyone needs to shout their numbers again so someone can type them into a Python cell or calculator.
-* The "Consultant" rule still applies: Fast groups should help slow groups, or else the final equation will never appear!
-
 ### 4. PANDAS SURVIVAL GUIDE (TECHNICAL REFERENCE)
 
 *Use these snippets to restore system integrity.*
