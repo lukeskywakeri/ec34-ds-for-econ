@@ -33,6 +33,7 @@ dependencies = [
     "seaborn>=0.13.2",
     "shap>=0.48.0",
     "statsmodels>=0.14.6",
+    "streamlit>=1.54.0",
     "torchvision>=0.24.1",
     "torchviz>=0.0.3",
     "uvicorn>=0.40.0",
