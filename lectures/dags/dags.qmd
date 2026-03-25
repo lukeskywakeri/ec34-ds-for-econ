@@ -14,10 +14,6 @@ subtitle: Thank you to Scott Cunningham!
 
 ## What is causality?
 
-- We talked a little about this in the beginning of the course.
-- For this class, we will explore two ways to think about causality:
-    - DAGS
-    - Potential Outcomes
 - Both present a way to think about causality in terms of *counterfactuals*.
     - Specifically, a causal effect is defined as a comparison between two states of the world:
         - One state where an intervention was applied, and another state where it wasn't

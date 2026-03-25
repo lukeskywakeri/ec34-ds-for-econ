@@ -161,3 +161,5 @@ cython_debug/
 .github
 .vscode
 lectures/efficient-coding/efficient-coding_files/
+lectures/dags/dags_files/
+lectures/dags/figures/

@@ -104,9 +104,9 @@ Course materials can be accessed on github. We will learn how to use GitHub in t
 | 7 | Mar 2,4 | Version Control, Midterm |  | `lectures/git-workflow` |
 | 8 | Mar 9,11 | Spring Break |  |  |
 | 9 | Mar 16,18 | Reproducibility, DAGs | HW1 Due | `lectures/dynamic-documents`, `lectures/dags` |
-| 10 | Mar 23,25 | Monte Carlo, Regression (RDD, DiD) |  | `lectures/monte-carlo`, `lectures/causal-regression` |
-| 11 | Mar 30, Apr 1 | Machine Learning | HW2 Due | `lectures/machine-learning` |
-| 12 | Apr 6, 8 | Neural Networks, Causal Machine Learning |  | `lectures/neural-net`, `lectures/causal-machine-learning` |
+| 10 | Mar 23,25 | Monte Carlo, Machine Learning |  | `lectures/monte-carlo`, `lectures/machine-learning` |
+| 11 | Mar 30, Apr 1 | Machine Learning, Neural Networks | HW2 Due | `lectures/machine-learning`, `lectures/neural-net` |
+| 12 | Apr 6, 8 | Regression (RDD, DiD), Causal Machine Learning |  |`lectures/causal-regression`, `lectures/causal-machine-learning` |
 | 13 | Apr 13,15 | Image Analysis with open-cv, OpenAI and LLMs | HW3 Due | `lectures/computer-vision`, `lectures/llms` |
 | 14 | Apr 20,22 | Maximum Likelihood in Python, Special Topic (TBA) |  | `lectures/gmm-mle` |
 | 15 | Apr 27,29 | Wrap-up; Group Presentations | HW4 Due |  |

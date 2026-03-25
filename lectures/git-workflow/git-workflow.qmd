@@ -5,7 +5,6 @@ author: Aleksandr Michuda
 format: 
   beamer:
     theme: metropolis
-institute: Center for Data Science for Enterprise and Society, Cornell University
 ---
 
 # What are we doing today?
@@ -20,8 +19,6 @@ institute: Center for Data Science for Enterprise and Society, Cornell Universit
 # 
 
 ![](figures/workflow.png)
-
-  sd;jgfhasdkpuoghak;shdpgkajhspdiufhapsuhdfpiiuhwpieefqpireuuqepuuhwpeuhg[wueehrügugwherhggweuhe4[guhu]]
     
 # Importance of Setting up Workflow
     
@@ -57,15 +54,12 @@ institute: Center for Data Science for Enterprise and Society, Cornell Universit
 
 - Created by Linus Torvalds in 2005 (creator of Linux)
   - Started as a way to keep track of the Linux kernel (but can be used for any project)
-    - Git being British slang for unpleasant person
 - Git works by keeping track of files in a repository (folder with your work in it)
   - And having a folder called .git that keeps track of branches, changes, adds and commits
 
 # 
 
-\begin{center}
-\includegraphics[]{figures/Kompare-Two-Files-in-Linux.png}
-\end{center}
+![](figures/Kompare-Two-Files-in-Linux.png)
 
 # How does that translate to our regular workflow?
 
@@ -144,8 +138,7 @@ Each version of a file is given some “name”
 
 # Getting Started
 
-- Open Github Desktop
-- Or open `Git Bash` or your shell or `Terminal` (for Macs)
+- Find the git icon on your vscode and click on it
 
 # Getting Started
 
@@ -156,18 +149,11 @@ Each version of a file is given some “name”
 # Forking and Cloning a Repository (Prelminaries)
 
 - Log in to your GitHub account.
-- Navigate to `https://github.com/staaars-plus/transparent-and-reproducible-research`
+- Navigate to `https://github.com/amichuda/ec34-ds-for-econ`
 - Click the Fork button (upper right corner of the page)
 - Wait for the project to fork to your Github account
 
 ![](figures/clone-repo-clone-url-button.png)
-
-
-# Forking and Cloning (GH Desktop)
-
-Use the Download or Clone button and copy the clone link.
-
-![](figures/clone-choose-button-url-win.png)
 
 
 # Forking and Cloning (Shell/Terminal)
@@ -178,35 +164,20 @@ Open a shell, Git Bash or Terminal and type:
 
 # Make a Change!
 
-- First choose the branch you want to make changes in
-
-![](figures/click-branch-in-drop-down.png)
-
+- Type something or make a change to the file
 
 # Commit 
 
-:::: columns
-::: column
 - Make necessary changes
 - Choose which files to add
 - Write a commit message
 - Commit!
 
-**For Terminal**
-
-- Type `git add <file>`
-- `git commit -m "my commit message"`
-:::
-::: column
-![](figures/commit-message.png){.width="75%"}
-:::
-::::
 
 # Push!
 
 - Click Push Origin to push changes
 
-![](figures/push-origin-button.png)
 
 **For Terminal**
 

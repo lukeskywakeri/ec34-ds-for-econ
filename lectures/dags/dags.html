@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.26">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Aleksandr Michuda">
+
+<title>Causality and Directed Acyclic Graphs</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="dags_files/libs/clipboard/clipboard.min.js"></script>
+<script src="dags_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="dags_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="dags_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="dags_files/libs/quarto-html/popper.min.js"></script>
+<script src="dags_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="dags_files/libs/quarto-html/anchor.min.js"></script>
+<link href="dags_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="dags_files/libs/quarto-html/quarto-syntax-highlighting-587c61ba64f3a5504c4d52d930310e48.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="dags_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="dags_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="dags_files/libs/bootstrap/bootstrap-d6a003b94517c951b2d65075d42fb01b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script src="dags_files/libs/quarto-diagram/mermaid.min.js"></script>
+<script src="dags_files/libs/quarto-diagram/mermaid-init.js"></script>
+<link href="dags_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Causality and Directed Acyclic Graphs</h1>
+<p class="subtitle lead">Thank you to Scott Cunningham!</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Aleksandr Michuda </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="agenda" class="level2">
+<h2 class="anchored" data-anchor-id="agenda">Agenda</h2>
+<ul>
+<li>What are Directed Acyclic Graphs (DAGs)?</li>
+<li>How are DAGs related to Bayes’ Theorem?</li>
+<li>Why are they useful?</li>
+<li>How are they used for understanding causality?</li>
+<li>How does this relate to potential outcomes?</li>
+</ul>
+</section>
+<section id="what-is-causality" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-causality">What is causality?</h2>
+<ul>
+<li>Both present a way to think about causality in terms of <em>counterfactuals</em>.
+<ul>
+<li>Specifically, a causal effect is defined as a comparison between two states of the world:
+<ul>
+<li>One state where an intervention was applied, and another state where it wasn’t</li>
+</ul></li>
+</ul></li>
+<li>One is more visual and the other, more mathy…</li>
+<li>DAGs and potential outcomes are different ways to think about the same thing.</li>
+<li>Potential outcomes might be a better way to express selection bias and the fundamental problem of causal inference.</li>
+<li>But DAGs are an intuitive way to think about causal relationships and are great for understanding omitted variable bias and confounding.</li>
+<li>But each can be expressed in terms of the other.</li>
+</ul>
+</section>
+<section id="what-are-directed-acyclic-graphs-dags" class="level2">
+<h2 class="anchored" data-anchor-id="what-are-directed-acyclic-graphs-dags">What are Directed Acyclic Graphs (DAGs)?</h2>
+<ul>
+<li>A directed acyclic graph (DAG) is a finite directed graph with no directed cycles.</li>
+<li>A directed graph is a way to represent a set of objects connected by edges, where the edges have a direction.</li>
+<li>The direction of the edges indicates the direction of the relationship between the objects.
+<ul>
+<li>Specifically, the causal relationship.</li>
+</ul></li>
+<li>Acyclic means that there are no cycles in the graph, i.e., it is not possible to start at one node and follow a sequence of edges that leads back to the same node.</li>
+<li>DAGs are often used to represent causal relationships between variables in a system.</li>
+</ul>
+</section>
+<section id="connection-to-causality" class="level2">
+<h2 class="anchored" data-anchor-id="connection-to-causality">Connection to Causality</h2>
+<ul>
+<li>DAGS represent a world of causality where one thing affects another in one direction.</li>
+<li>Represents a chain of causal relationships.</li>
+<li>The causal effects represent some underlying unobserved process.</li>
+<li>So DAGS are powerful, but they aren’t good at representing things such as:
+<ul>
+<li>Reverse Causality</li>
+<li>Simultaneity</li>
+</ul></li>
+</ul>
+</section>
+<section id="causal-effects" class="level2">
+<h2 class="anchored" data-anchor-id="causal-effects">Causal Effects</h2>
+<ul>
+<li><p>Causal Effects can happen in two ways:</p></li>
+<li><p>Direct:</p></li>
+</ul>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    D --&gt; Y
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<ul>
+<li>Mediated (indirect):</li>
+</ul>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    D --&gt; X --&gt; Y
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<ul>
+<li>A DAG represents the full set of causal relationships in a system and their effect on Y, the outcome</li>
+<li>Which also means that a lack of an arrow explicitly means that there is no causal relationship between the two variables.</li>
+</ul>
+</section>
+<section id="the-causal-model" class="level2">
+<h2 class="anchored" data-anchor-id="the-causal-model">The Causal Model</h2>
+<ul>
+<li>Where does the DAG come from?</li>
+<li>A DAG is a theoretical representation of the state-of-the-art knowledge about the phenomena you’re studying.</li>
+<li>It’s what an expert would say is the thing itself, and that expertise comes from a variety of sources.</li>
+<li>Examples include economic theory, other scientific models, conversations with experts, your own observations and experiences, literature reviews, as well as your own intuition and hypotheses.</li>
+</ul>
+</section>
+<section id="why" class="level2">
+<h2 class="anchored" data-anchor-id="why">Why?</h2>
+<ul>
+<li>Causality and understanding causal relationships cannot be a one-size-fits-all approach or one that can be “discovered” in the data.</li>
+<li>DAGs are very helpful for communicating research designs and estimators</li>
+<li>Through concepts such as the backdoor criterion and collider bias, a well-designed DAG can help you develop a credible research design for identifying the causal effects of some intervention.<br>
+</li>
+<li>And finally, DAGs drive home the point that assumptions are necessary for any and all identification of causal effects</li>
+</ul>
+</section>
+<section id="a-simple-example" class="level2">
+<h2 class="anchored" data-anchor-id="a-simple-example">A simple example</h2>
+<p><img src="figures/simple_dag-1.png" class="img-fluid"></p>
+<ul>
+<li>Three random variables: <span class="math inline">\(X\)</span>, <span class="math inline">\(Y\)</span>, and <span class="math inline">\(D\)</span>.</li>
+<li>A direct path from <span class="math inline">\(D\)</span> to <span class="math inline">\(Y\)</span>.</li>
+<li>A direct path from <span class="math inline">\(X\)</span> to <span class="math inline">\(Y\)</span>.</li>
+<li>But also <span class="math inline">\(D \leftarrow X \to Y\)</span>.
+<ul>
+<li>A “backdoor” path.</li>
+</ul></li>
+<li>Not a causal path.</li>
+<li>The backdoor path is a confounding path.</li>
+<li>Creates a spurious correlation between <span class="math inline">\(D\)</span> and <span class="math inline">\(Y\)</span>.</li>
+<li>Similar to “omitted variable bias” in regression.</li>
+</ul>
+</section>
+<section id="what-is-omitted-variable-bias" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-omitted-variable-bias">What is omitted variable bias?</h2>
+<ul>
+<li>Omitted variable bias is a type of bias that occurs when a model does not include one or more relevant variables.</li>
+<li>This can lead to biased estimates of the causal effect of the included variables on the outcome variable.</li>
+<li>If our true model is:</li>
+</ul>
+<p><span class="math display">\[
+Y = \beta_0 + \beta_1 D + \beta_2 X + \varepsilon
+\]</span></p>
+<p>But suppose you run a “naive” regression:</p>
+<p><span class="math display">\[
+Y = \tilde{\beta}_0 + \tilde{\beta}_1 D + \tilde{\varepsilon}
+\]</span></p>
+<p>Then <span class="math inline">\(\tilde{\varepsilon} = \beta_2 X + \epsilon\)</span>.</p>
+</section>
+<section id="back-to-dags" class="level2">
+<h2 class="anchored" data-anchor-id="back-to-dags">Back to DAGs</h2>
+<ul>
+<li>Not controlling for <span class="math inline">\(X\)</span> creates a “backdoor” path from <span class="math inline">\(D\)</span> to <span class="math inline">\(Y\)</span>.</li>
+<li><span class="math inline">\(X\)</span> is a confounder.</li>
+<li>Also a “noncollider”.</li>
+<li>A noncollider is a variable that is not a common effect of two other variables.</li>
+<li>We call <span class="math inline">\(X\)</span> a confounder because it is a common cause of <span class="math inline">\(D\)</span> and <span class="math inline">\(Y\)</span>.</li>
+<li>Sometimes <span class="math inline">\(D\)</span> takes different values and causes changes in <span class="math inline">\(Y\)</span></li>
+<li>But sometimes <span class="math inline">\(D\)</span> takes different values and <span class="math inline">\(Y\)</span> changes because of <span class="math inline">\(X\)</span>.</li>
+<li>If we could “control” for <span class="math inline">\(X\)</span>, we could eliminate the backdoor path.
+<ul>
+<li>Because our OLS regression would calculate <span class="math inline">\(b_1\)</span> such that we would take into account the effect of <span class="math inline">\(X\)</span> on <span class="math inline">\(Y\)</span> and <span class="math inline">\(X\)</span> on <span class="math inline">\(D\)</span>.</li>
+</ul></li>
+</ul>
+</section>
+<section id="unobserved-confounder" class="level2">
+<h2 class="anchored" data-anchor-id="unobserved-confounder">Unobserved Confounder</h2>
+<ul>
+<li>What if the confounder between <span class="math inline">\(D\)</span> and <span class="math inline">\(Y\)</span> is unobserved?</li>
+<li>In this case, we show the confounder as a dashed line.</li>
+</ul>
+<p><img src="figures/earnings_dag-1.png" class="img-fluid"></p>
+<ul>
+<li><span class="math inline">\(U\)</span> is a unobserved confounder.</li>
+<li>It exists, but may not be measurable, or is missing from the data.</li>
+<li>This backdoor path is <em>open</em>.</li>
+</ul>
+</section>
+<section id="more-realistic-example" class="level2">
+<h2 class="anchored" data-anchor-id="more-realistic-example">More Realistic Example</h2>
+<p><img src="figures/earnings_dag_backdoor-1.png" class="img-fluid"></p>
+<p>Does college education cause higher earnings?</p>
+<p>According to Becker, education increases the marginal product of labor, and since markets pay their marginal product, education increases earnings.</p>
+<ul>
+<li><p>But college education is not randomly assigned.</p></li>
+<li><p>Chosen based on subjective preferences and resource constraints.</p></li>
+<li><p>Here, <span class="math inline">\(D\)</span> is college education, <span class="math inline">\(Y\)</span> is earnings, <span class="math inline">\(PE\)</span> be parental education, <span class="math inline">\(I\)</span> is family income, <span class="math inline">\(B\)</span> are unobserved background factors such as ability.</p></li>
+</ul>
+<p>What do you think this of this DAG? Do you agree with it? Is there something missing?</p>
+<blockquote class="blockquote">
+<p>Each person has some background. It’s not contained in most data sets, as it measures things like intelligence, contentiousness, mood stability, motivation, family dynamics, and other environmental factors. Hence, it is unobserved in the picture. Those environmental factors are likely correlated between parent and child and therefore subsumed in the variable <span class="math inline">\(B\)</span>.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Background causes a child’s parent to choose her own optimal level of education, and that choice also causes the child to choose their level of education through a variety of channels. First, there is the shared background factors, <span class="math inline">\(B\)</span>. Those background factors cause the child to choose a level of education, just as her parent had. Second, there’s a direct effect, perhaps through simple modeling of achievement or setting expectations, a kind of peer effect. And third, there’s the effect that parental education has on family earnings, <span class="math inline">\(I\)</span>, which in turn affects how much schooling the child receives. Family earnings may itself affect the child’s future earnings through bequests and other transfers, as well as external investments in the child’s productivity.</p>
+</blockquote>
+</section>
+<section id="dags-also-tell-us-what-is-not-happening" class="level2">
+<h2 class="anchored" data-anchor-id="dags-also-tell-us-what-is-not-happening">DAGs also tell us what IS NOT Happening</h2>
+<ul>
+<li>No direct from <span class="math inline">\(B\)</span> to <span class="math inline">\(Y\)</span>, except through schooling.
+<ul>
+<li>That’s an assumption</li>
+<li>And you are free to call foul on this assumption if you think that background factors affect both schooling and the child’s own productivity</li>
+</ul></li>
+</ul>
+</section>
+<section id="next-steps" class="level2">
+<h2 class="anchored" data-anchor-id="next-steps">Next Steps</h2>
+<p>List all direct and indirect paths:</p>
+<ul>
+<li><p><span class="math inline">\(D \rightarrow Y\)</span> (the causal effect of education on earnings)</p></li>
+<li><p><span class="math inline">\(D \leftarrow I \rightarrow Y\)</span> (the effect of family income on earnings, through education, <strong>backdoor path 1</strong>)</p></li>
+<li><p><span class="math inline">\(D \leftarrow PE \rightarrow I \rightarrow Y\)</span> (the effect of parental education on earnings, through family income, and education, <strong>backdoor path 2</strong>)</p></li>
+<li><p><span class="math inline">\(D \leftarrow B \rightarrow PE \rightarrow I \rightarrow Y\)</span> (the effect of background on earnings, through parental education, through family income, and education, <strong>backdoor path 3</strong>)</p></li>
+<li><p>Four paths between <span class="math inline">\(D\)</span> and <span class="math inline">\(Y\)</span>.</p>
+<ul>
+<li>One direct path and three backdoor paths</li>
+<li>Since none of them are colliders, the paths are all <em>open</em>.</li>
+</ul></li>
+<li><p>Open backdoor paths is that they create systematic and independent correlations between <span class="math inline">\(D\)</span> and <span class="math inline">\(Y\)</span>.</p></li>
+<li><p>Put a different way, the presence of open backdoor paths introduces bias when comparing educated and less-educated workers.</p></li>
+</ul>
+</section>
+<section id="colliding" class="level2">
+<h2 class="anchored" data-anchor-id="colliding">Colliding</h2>
+<ul>
+<li>But what is a collider?</li>
+</ul>
+<p><img src="figures/collider-1.png" class="img-fluid"></p>
+<p>So the paths are now:</p>
+<ul>
+<li><p><span class="math inline">\(D \rightarrow Y\)</span> (the direct effect)</p></li>
+<li><p><span class="math inline">\(D \rightarrow X \leftarrow Y\)</span> (backdoor path)</p></li>
+<li><p>Colliders are special in part because when they appear along a backdoor path, that backdoor path is <strong>closed</strong> simply because of their presence.</p></li>
+<li><p>Colliders, when they are left alone, always close a specific backdoor path.</p></li>
+</ul>
+</section>
+<section id="backdoor-criterion" class="level2">
+<h2 class="anchored" data-anchor-id="backdoor-criterion">Backdoor Criterion</h2>
+<ul>
+<li>Open backdoor paths create omitted variable bias.</li>
+<li>Closed backdoor paths do not create omitted variable bias.</li>
+<li>Our goal is to close the backdoor paths.</li>
+</ul>
+<p>Two ways:</p>
+<ol type="1">
+<li>You can condition on the confounder (control for that variable)</li>
+<li>Or you can close it through the appearance of a collider.</li>
+</ol>
+<ul>
+<li>By not conditioning on a collider, you will have closed that backdoor path and that takes you closer to your larger ambition to isolate some causal effect.</li>
+</ul>
+</section>
+<section id="controlling-for-confounders" class="level2">
+<h2 class="anchored" data-anchor-id="controlling-for-confounders">Controlling for Confounders</h2>
+<ul>
+<li><p>When all backdoors are closed, then you have satisfied the backdoor criterion.</p></li>
+<li><p>A set of variables satisfies the backdoor criterion in a DAG if and only if <span class="math inline">\(X\)</span> blocks every path between confounders that contain an arrow from <span class="math inline">\(D\)</span> to <span class="math inline">\(Y\)</span></p></li>
+</ul>
+</section>
+<section id="back-to-the-example" class="level2">
+<h2 class="anchored" data-anchor-id="back-to-the-example">Back to the Example</h2>
+<p><img src="figures/backdoor_criterion-1.png" class="img-fluid"></p>
+<ul>
+<li>The backdoor criterion is a way to identify confounding variables in a DAG. In this case, <span class="math inline">\(I\)</span> is a non-collider along every backdoor path.</li>
+</ul>
+<p>By conditioning on <span class="math inline">\(I\)</span>, we can close the backdoor paths and isolate the causal effect of <span class="math inline">\(D\)</span> on <span class="math inline">\(Y\)</span>.</p>
+<p><span class="math display">\[
+Y_i = \alpha + \delta D_i + \beta I_i + \varepsilon_i
+\]</span></p>
+<ul>
+<li>By conditioning/controlling <span class="math inline">\(I\)</span>, <span class="math inline">\(D\)</span> takes on a causal interpretation.</li>
+</ul>
+</section>
+<section id="calling-the-dag-into-question" class="level2">
+<h2 class="anchored" data-anchor-id="calling-the-dag-into-question">Calling the DAG into question</h2>
+<ul>
+<li>But what if that DAG is not satisfying…</li>
+<li>What if <span class="math inline">\(B\)</span>, or background has a direct effect on <span class="math inline">\(Y\)</span>?</li>
+</ul>
+<p><img src="figures/direct_connection-1.png" class="img-fluid"></p>
+<ul>
+<li>In this case, <span class="math inline">\(B\)</span> is a confounder.</li>
+<li>And we don’t know the nature of <span class="math inline">\(B\)</span> because it is an unobserved variable.</li>
+<li>So we can’t condition on it.</li>
+<li>So we can’t close the backdoor path.</li>
+<li>So we can’t isolate the causal effect of <span class="math inline">\(D\)</span> on <span class="math inline">\(Y\)</span>.</li>
+</ul>
+</section>
+<section id="why-shouldnt-we-condition-on-colliders" class="level2">
+<h2 class="anchored" data-anchor-id="why-shouldnt-we-condition-on-colliders">Why shouldn’t we condition on colliders?</h2>
+<p><img src="figures/collider-1.png" class="img-fluid"></p>
+<ul>
+<li>Conditioning on a collider opens up a backdoor path.</li>
+<li>Why?</li>
+<li>Because conditioning on a collider creates a correlation between the two variables that are not otherwise correlated.</li>
+<li>Intuition: If you condition on a variable that is a common effect of two other variables, you are creating a correlation between those two variables that is not otherwise there.</li>
+<li>Same as the idea that if two variables are independent, conditioning on a third variable might create a correlation between them.</li>
+</ul>
+</section>
+<section id="example-discrimination-and-collider-bias" class="level2">
+<h2 class="anchored" data-anchor-id="example-discrimination-and-collider-bias">Example: Discrimination and Collider Bias</h2>
+<ul>
+<li>Gender Discrimination in labor markets</li>
+<li>Age-old explanation that gender discrimination does not exist: Once we account for factors such as location, tenure, job role, level, performance, time off etc…, there is no longer any difference in pay between men and women.</li>
+<li>But what if discrimination is through occupational sorting?
+<ul>
+<li>If discrimination leads to women taking lower quality and lower-paying jobs, then accounting for occupation is actually a collider!</li>
+</ul></li>
+</ul>
+<p><img src="figures/more_example_dag_2-1.png" class="img-fluid"></p>
+<ol type="1">
+<li>D -&gt; discrimination</li>
+<li>O -&gt; occupation</li>
+<li>Y -&gt; earnings</li>
+<li>F -&gt; female ==1</li>
+<li>A -&gt; ability</li>
+</ol>
+<p>What are the paths?</p>
+<ul>
+<li><span class="math inline">\(D \rightarrow O \rightarrow Y\)</span> (discrimination affects occupation, which affects earnings)</li>
+<li><span class="math inline">\(D \rightarrow O \leftarrow A \rightarrow Y\)</span> (discrimination affects occupation, and so does ability, which affects earnings)</li>
+</ul>
+<p>The first is not a backdoor path, but rather what’s called a “mediation”</p>
+<p>Discrimination is “mediated” through occupation before it affects earnings.</p>
+<blockquote class="blockquote">
+<p>This would imply that women are discriminated against, which in turn affects which jobs they hold, and as a result of holding marginally worse jobs, women are paid less.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>The second path relates to that channel but is slightly more complicated. In this path, unobserved ability affects both which jobs people get and their earnings.</p>
+</blockquote>
+</section>
+<section id="our-regression" class="level2">
+<h2 class="anchored" data-anchor-id="our-regression">Our Regression</h2>
+<p>If we just run the following regression:</p>
+<p><span class="math display">\[
+Y_i = \alpha + \beta D_i + \varepsilon_i
+\]</span></p>
+<p><span class="math inline">\(\beta\)</span> will yield the total effect as a combination of the direct effect and the mediated effect through occupation.</p>
+<p>But if we wanted to condition on occupation, so that we could compare men and women in similar jobs:</p>
+<p><span class="math display">\[
+Y_i = \alpha + \beta D_i + \gamma O_i + \varepsilon_i
+\]</span></p>
+<ul>
+<li>In this case, we close the mediation channel, but conditioning on <span class="math inline">\(O\)</span> opens the backdoor path because it is a collider!</li>
+<li>We’ve now created correlation between discrimination and ability!</li>
+<li>Why?</li>
+<li>By conditioning on occupation, we are looking at the effect of discrimination <em>within</em> an occupation, where discrimination and ability confound each other.</li>
+<li>We don’t know whether within an occupation, earnings are being driven by discrimination or by differences in ability.</li>
+<li>What we need to control for then is occupation <em>and</em> ability.</li>
+<li>But we don’t know the nature of ability, so we can’t condition on it.</li>
+</ul>
+</section>
+<section id="python-example" class="level2">
+<h2 class="anchored" data-anchor-id="python-example">Python Example</h2>
+<div id="8f4611d1" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statsmodels.formula.api <span class="im">as</span> smf</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">123</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="dv">10000</span> </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Half of the population is female. </span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>female <span class="op">=</span> (np.random.uniform(size<span class="op">=</span>n) <span class="op">&gt;=</span> <span class="fl">0.5</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Innate ability is independent of gender. </span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>ability <span class="op">=</span> np.random.normal(size<span class="op">=</span>n) </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># All women experience discrimination. </span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>discrimination <span class="op">=</span> female </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Data generating processes</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># occupation is a function of ability,  and discrimination as in DAG</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>occupation <span class="op">=</span> <span class="dv">1</span> <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> ability <span class="op">+</span> <span class="dv">0</span> <span class="op">*</span> female <span class="op">-</span> <span class="dv">2</span> <span class="op">*</span> discrimination <span class="op">+</span> np.random.normal(size<span class="op">=</span>n)</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>wage <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> <span class="dv">1</span> <span class="op">*</span> discrimination <span class="op">+</span> <span class="dv">1</span> <span class="op">*</span> occupation <span class="op">+</span> <span class="dv">2</span> <span class="op">*</span> ability <span class="op">+</span> np.random.normal(size<span class="op">=</span>n)</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Create DataFrame</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">'wage'</span>: wage, </span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">'discrimination'</span>: discrimination, </span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="st">'occupation'</span>: occupation, </span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="st">'ability'</span>: ability</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="co"># Regressions</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Total Effect</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(smf.ols(<span class="st">"wage ~ discrimination"</span>, data<span class="op">=</span>df).fit().summary())</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Controlling for Collider (Occupation)</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(smf.ols(<span class="st">"wage ~ discrimination + occupation"</span>, data<span class="op">=</span>df).fit().summary())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                   wage   R-squared:                       0.113
+Model:                            OLS   Adj. R-squared:                  0.112
+Method:                 Least Squares   F-statistic:                     1268.
+Date:                Mon, 23 Mar 2026   Prob (F-statistic):          1.34e-261
+Time:                        13:14:20   Log-Likelihood:                -28640.
+No. Observations:               10000   AIC:                         5.728e+04
+Df Residuals:                    9998   BIC:                         5.730e+04
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==================================================================================
+                     coef    std err          t      P&gt;|t|      [0.025      0.975]
+----------------------------------------------------------------------------------
+Intercept          2.0890      0.060     34.696      0.000       1.971       2.207
+discrimination    -3.0216      0.085    -35.610      0.000      -3.188      -2.855
+==============================================================================
+Omnibus:                        2.180   Durbin-Watson:                   1.955
+Prob(Omnibus):                  0.336   Jarque-Bera (JB):                2.194
+Skew:                           0.036   Prob(JB):                        0.334
+Kurtosis:                       2.988   Cond. No.                         2.63
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                   wage   R-squared:                       0.911
+Model:                            OLS   Adj. R-squared:                  0.911
+Method:                 Least Squares   F-statistic:                 5.142e+04
+Date:                Mon, 23 Mar 2026   Prob (F-statistic):               0.00
+Time:                        13:14:20   Log-Likelihood:                -17119.
+No. Observations:               10000   AIC:                         3.424e+04
+Df Residuals:                    9997   BIC:                         3.426e+04
+Df Model:                           2                                         
+Covariance Type:            nonrobust                                         
+==================================================================================
+                     coef    std err          t      P&gt;|t|      [0.025      0.975]
+----------------------------------------------------------------------------------
+Intercept          0.2533      0.020     12.677      0.000       0.214       0.292
+discrimination     0.5729      0.029     19.512      0.000       0.515       0.631
+occupation         1.8024      0.006    300.235      0.000       1.791       1.814
+==============================================================================
+Omnibus:                        2.774   Durbin-Watson:                   1.977
+Prob(Omnibus):                  0.250   Jarque-Bera (JB):                2.755
+Skew:                          -0.026   Prob(JB):                        0.252
+Kurtosis:                       2.937   Cond. No.                         6.15
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.</code></pre>
+</div>
+</div>
+</section>
+<section id="lessons-from-colliders-bad-controls" class="level2">
+<h2 class="anchored" data-anchor-id="lessons-from-colliders-bad-controls">Lessons from Colliders: Bad Controls</h2>
+<ul>
+<li>Econometrics in many cases takes a “kitchen sink” approach to regression.</li>
+<li>The idea is that the more controls you have, the better your estimate of the causal effect.</li>
+<li>But this is not true.</li>
+<li>Conditioning on a collider can open up backdoor paths and create spurious correlations.</li>
+<li>This is a form of “bad control”.</li>
+<li>Bad controls are variables that are not causally related to the outcome variable, but are included in the model anyway.</li>
+<li>Bad controls can create bias in the estimates of the causal effect of the included variables on the outcome variable.</li>
+</ul>
+</section>
+<section id="estimating-causal-effects-with-dags" class="level2">
+<h2 class="anchored" data-anchor-id="estimating-causal-effects-with-dags">Estimating Causal Effects with DAGs</h2>
+<ul>
+<li>We can definitely distill DAGs down to regression equations.</li>
+<li>But what if we wanted to estimate causal effects directly from the DAG?</li>
+<li>It involves taking the tree as it is and estimating the causal effect of <span class="math inline">\(D\)</span> on <span class="math inline">\(Y\)</span> by “intervening” on <span class="math inline">\(D\)</span>.</li>
+</ul>
+<div id="ed102973" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dowhy <span class="im">import</span> CausalModel</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> CausalModel(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    data<span class="op">=</span>df,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    treatment<span class="op">=</span><span class="st">'discrimination'</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    outcome<span class="op">=</span><span class="st">'wage'</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    graph<span class="op">=</span><span class="st">"""</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="st">    digraph {</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="st">        discrimination -&gt; occupation;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="st">        discrimination -&gt; wage;</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="st">        ability -&gt; occupation;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="st">        ability -&gt; wage;</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="st">        occupation -&gt; wage;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>identified_estimand <span class="op">=</span> model.identify_effect(proceed_when_unidentifiable<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(identified_estimand)</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"""</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="st">-------------</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>causal_estimate <span class="op">=</span> model.estimate_effect(identified_estimand,</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>        method_name<span class="op">=</span><span class="st">"backdoor.linear_regression"</span>)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(causal_estimate)</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>res_placebo <span class="op">=</span> model.refute_estimate(identified_estimand, causal_estimate, method_name<span class="op">=</span><span class="st">"placebo_treatment_refuter"</span>, placebo_type<span class="op">=</span><span class="st">"permute"</span>)</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"""</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="st">-------------</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span>)</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(res_placebo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Estimand type: EstimandType.NONPARAMETRIC_ATE
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+        d                 
+─────────────────(E[wage])
+d[discrimination]         
+Estimand assumption 1, Unconfoundedness: If U→{discrimination} and U→wage then P(wage|discrimination,,U) = P(wage|discrimination,)
+
+### Estimand : 2
+Estimand name: iv
+No such variable(s) found!
+
+### Estimand : 3
+Estimand name: frontdoor
+No such variable(s) found!
+
+### Estimand : 4
+Estimand name: general_adjustment
+Estimand expression:
+        d                 
+─────────────────(E[wage])
+d[discrimination]         
+Estimand assumption 1, Unconfoundedness: If U→{discrimination} and U→wage then P(wage|discrimination,,U) = P(wage|discrimination,)
+
+
+
+-------------
+
+
+
+*** Causal Estimate ***
+
+## Identified estimand
+Estimand type: EstimandType.NONPARAMETRIC_ATE
+
+### Estimand : 1
+Estimand name: backdoor
+Estimand expression:
+        d                 
+─────────────────(E[wage])
+d[discrimination]         
+Estimand assumption 1, Unconfoundedness: If U→{discrimination} and U→wage then P(wage|discrimination,,U) = P(wage|discrimination,)
+
+## Realized estimand
+b: wage~discrimination+discrimination*ability
+Target units: 
+
+## Estimate
+Mean value: -3.0098208361235295
+### Conditional Estimates
+__categorical__ability
+(-3.52, -0.839]    -8.530698
+(-0.839, -0.242]   -5.171306
+(-0.242, 0.276]    -3.010512
+(0.276, 0.865]     -0.917447
+(0.865, 4.068]      2.580859
+dtype: float64
+
+
+-------------
+
+
+
+Refute: Use a Placebo Treatment
+Estimated effect:-3.0098208361235295
+New effect:0.002811402820497047
+p value:0.9199999999999999
+</code></pre>
+</div>
+</div>
+</section>
+<section id="using-instruments-with-dags" class="level2">
+<h2 class="anchored" data-anchor-id="using-instruments-with-dags">Using Instruments with DAGs</h2>
+<ul>
+<li>DAGs can also help us understand instrumental variables.</li>
+<li>An instrument is a variable that affects the treatment variable, but does not directly affect the outcome variable.</li>
+<li>The instrument affects the outcome variable only through the treatment variable.</li>
+</ul>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    Z --&gt; D --&gt; Y
+    U -.-&gt; D
+    U -.-&gt; Y 
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="instrumental-variables-example" class="level2">
+<h2 class="anchored" data-anchor-id="instrumental-variables-example">Instrumental Variables Example</h2>
+<ul>
+<li>Suppose we want to estimate the effect of education on earnings.</li>
+<li>But we have an unobserved confounder, ability, that affects both education and earnings.</li>
+<li>We can use an instrument, such as proximity to a college, to estimate the effect of education on earnings.</li>
+</ul>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
