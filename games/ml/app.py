@@ -144,7 +144,7 @@ def render_sidebar():
         st.markdown("""
 **How to play**
 1. Read the mission brief
-2. Copy the code into a Jupyter notebook
+2. Use the provided notebook and fill in the missing pieces
 3. Run it — inspect the output
 4. Enter your answer above
 """)
@@ -509,7 +509,7 @@ def header():
 
     st.info("""
 **How this works:** Each module gives you a scenario, an explanation, and a code block.
-Copy the code into Jupyter (or any Python environment), run it, inspect the output,
+Use the provided notebook, run it, inspect the output,
 and enter the answer below. The seeds are fixed — your numbers will match exactly.
 """)
 
