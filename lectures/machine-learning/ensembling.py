@@ -107,8 +107,16 @@ def _(DecisionTreeRegressor, X, mo, n_trees_slider, np, plt, y):
     _fig, _ax = plt.subplots(figsize=(9, 4))
     _ax.scatter(X, y, alpha=0.4, label="Data", color="steelblue")
     if n_trees_slider.value == 1:
-        _ax.plot(X, _preds[:, 0], color="orange", lw=2, alpha=0.7, label="Single tree (noisy)")
-    _ax.plot(X, bagged_y, color="red", lw=3, label=f"Bagged average ({n_trees_slider.value} trees)")
+        _ax.plot(
+            X, _preds[:, 0], color="orange", lw=2, alpha=0.7, label="Single tree (noisy)"
+        )
+    _ax.plot(
+        X,
+        bagged_y,
+        color="red",
+        lw=3,
+        label=f"Bagged average ({n_trees_slider.value} trees)",
+    )
     _ax.set_title(f"Bagging: {n_trees_slider.value} tree(s)")
     _ax.set_xlabel("x")
     _ax.set_ylabel("y")
@@ -172,9 +180,9 @@ def _(mo):
 
 @app.cell
 def _(DecisionTreeRegressor, X, mo, np, plt, y):
-    _eta = 0.5          # learning rate for the illustration
-    _n_steps = 5        # number of steps to show
-    _max_depth = 1      # shallow stumps
+    _eta = 0.5  # learning rate for the illustration
+    _n_steps = 5  # number of steps to show
+    _max_depth = 1  # shallow stumps
 
     _cumulative = np.full(len(X), y.mean())  # start from the mean
 
@@ -211,17 +219,24 @@ def _(DecisionTreeRegressor, X, mo, np, plt, y):
         if _step == _n_steps - 1:
             _ax_r.set_xlabel("x")
 
-    plt.suptitle(f"Gradient Boosting — {_n_steps} steps, η={_eta}, max_depth={_max_depth}", fontsize=12, y=1.01)
+    plt.suptitle(
+        f"Gradient Boosting — {_n_steps} steps, η={_eta}, max_depth={_max_depth}",
+        fontsize=12,
+        y=1.01,
+    )
     plt.tight_layout()
     plt.close()
 
     mo.vstack([
         mo.as_html(_fig),
-        mo.callout(mo.md(
-            f"Each stump only captures a coarse piece of the remaining signal. "
-            f"After {_n_steps} steps with η={_eta}, the cumulative fit is already close to the sine wave — "
-            f"without any single model seeing the full picture."
-        ), kind="success"),
+        mo.callout(
+            mo.md(
+                f"Each stump only captures a coarse piece of the remaining signal. "
+                f"After {_n_steps} steps with η={_eta}, the cumulative fit is already close to the sine wave — "
+                f"without any single model seeing the full picture."
+            ),
+            kind="success",
+        ),
     ])
     return
 
@@ -229,7 +244,9 @@ def _(DecisionTreeRegressor, X, mo, np, plt, y):
 @app.cell
 def _(mo):
     boosting_steps = mo.ui.slider(1, 150, label="Boosting Iterations", value=1)
-    lr_dropdown = mo.ui.dropdown(["0.01", "0.1", "0.5"], label="Learning Rate (η)", value="0.1")
+    lr_dropdown = mo.ui.dropdown(
+        ["0.01", "0.1", "0.5"], label="Learning Rate (η)", value="0.1"
+    )
     return boosting_steps, lr_dropdown
 
 
@@ -249,7 +266,9 @@ def _(GradientBoostingRegressor, X, boosting_steps, lr_dropdown, mo, plt, y):
 
     # Left: fit
     _axes[0].scatter(X, y, alpha=0.4, color="steelblue", label="Data")
-    _axes[0].plot(X, boosted_y, color="green", lw=3, label=f"Boosted ({boosting_steps.value} steps)")
+    _axes[0].plot(
+        X, boosted_y, color="green", lw=3, label=f"Boosted ({boosting_steps.value} steps)"
+    )
     _axes[0].set_title(f"Boosting fit  |  η={lr_dropdown.value}")
     _axes[0].set_xlabel("x")
     _axes[0].legend()
@@ -269,7 +288,11 @@ def _(GradientBoostingRegressor, X, boosting_steps, lr_dropdown, mo, plt, y):
     _note = (
         "⚠️ Still underfitting — try more iterations or a higher learning rate."
         if _r2 < 0.5
-        else ("⚠️ Potentially overfitting — residuals have no pattern left to exploit." if _r2 > 0.97 else f"✅ Good fit  (in-sample R² = {_r2:.3f})")
+        else (
+            "⚠️ Potentially overfitting — residuals have no pattern left to exploit."
+            if _r2 > 0.97
+            else f"✅ Good fit  (in-sample R² = {_r2:.3f})"
+        )
     )
 
     mo.vstack([
@@ -331,7 +354,7 @@ def _(bagged_y, boosted_y, mo, pd, sm, y):
         mo.ui.table(_coef_df),
         mo.md(f"""
     **Interpretation:**
-    - The meta-learner assigns weight **{_res.params['Bagging']:.3f}** to bagging and **{_res.params['Boosting']:.3f}** to boosting.
+    - The meta-learner assigns weight **{_res.params["Bagging"]:.3f}** to bagging and **{_res.params["Boosting"]:.3f}** to boosting.
     - A p-value < 0.05 means that model's predictions carry statistically significant information *beyond* what the other model provides.
     - The intercept being close to 0 means neither model has a systematic bias.
         """),
